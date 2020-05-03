@@ -1,0 +1,21 @@
+{
+  "name": "hubhub",
+  "version": "1.0.0",
+  "description": "uses a WIX website in iframe for free pubsub service",
+  "main": "dist/hubhub.js",
+  "module": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayal/hubhub.git"
+  },
+  "author": "ayal",
+  "license": "ISC",
+  "homepage": "https://github.com/ayal/hubhub#readme",
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
