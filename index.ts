@@ -36,13 +36,13 @@ class HubHub implements HubHubType {
 
         this.onMessageCB = cb;
 
-        console.log('embedding wix iframe...', this.pubsubService);
+        console.log('embedding wix iframe...', this.pubsubService, this.room);
 
         this.room = room;
         const framewrap = document.createElement('div');
         framewrap.hidden = true;
         framewrap.id = 'hubhub-frame-wrap';
-        framewrap.innerHTML = `<iframe src="${this.pubsubService}/pubsub?room=${room}" title="hubhub id="hubhub-frame"></iframe>`;
+        framewrap.innerHTML = `<iframe src="${this.pubsubService}?room=${room}" title="hubhub id="hubhub-frame"></iframe>`;
         document.body.appendChild(framewrap);
 
         console.log('embedded wix iframe...', this.pubsubService);
@@ -66,7 +66,7 @@ class HubHub implements HubHubType {
         }
         const msgstring = JSON.stringify({ sender_id: this.sender_id, msg })
         fetch(
-            `${this.pubsubService}/pubsub/_functions/pubsub?room=${this.room}&message=${msgstring}`
+            `${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`
         );
     }
 }
