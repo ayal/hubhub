@@ -3,7 +3,6 @@
   "version": "1.0.24",
   "description": "uses a WIX website in iframe for free pubsub service",
   "main": "dist/index.js",
-  "module": "index.ts",
   "scripts": {
     "build": "webpack --config webpack.config.js"
   },
