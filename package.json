@@ -2,9 +2,10 @@
   "name": "hubhub",
   "version": "1.0.25",
   "description": "uses a WIX website in iframe for free pubsub service",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "webpack --config webpack.config.js"
+    "build": "rm -rf dist && webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",
