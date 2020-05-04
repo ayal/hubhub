@@ -17,8 +17,9 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'hubhub.js',
+        filename: 'index.js',
         library: 'hubhub',
         libraryTarget: 'umd',
+        umdNamedDefine: true
     },
 };
