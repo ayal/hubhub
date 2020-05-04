@@ -1,6 +1,6 @@
 {
   "name": "hubhub",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "uses a WIX website in iframe for free pubsub service",
   "main": "dist/hubhub.js",
   "module": "index.js",
