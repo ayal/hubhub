@@ -6,13 +6,13 @@ function hubhub_uuidv4(): string {
     });
 }
 
-interface MsgType {
+export interface MsgType {
     self: boolean;
     msg: string;
     sender_id: string;
 }
 
-interface HubHubType {
+export interface HubHubType {
     onMessageCB(msg: MsgType): void;
     subscribe(x: string, cb: (msg: MsgType) => void): void,
     sendMessage(x: string): void;
@@ -21,7 +21,7 @@ interface HubHubType {
     sender_id?: string;
 }
 
-class HubHub implements HubHubType {
+export class HubHub implements HubHubType {
     sender_id = '';
     pubsubService = '';
     onMessageCB = (msg: MsgType) => { };
@@ -77,5 +77,4 @@ class HubHub implements HubHubType {
     }
 }
 
-export default HubHub;
 
