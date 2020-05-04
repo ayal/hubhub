@@ -36,12 +36,16 @@ class HubHub implements HubHubType {
 
         this.onMessageCB = cb;
 
+        console.log('embedding wix iframe...', this.pubsubService);
+
         this.room = room;
         const framewrap = document.createElement('div');
         framewrap.hidden = true;
         framewrap.id = 'hubhub-frame-wrap';
         framewrap.innerHTML = `<iframe src="${this.pubsubService}/pubsub?room=${room}" title="hubhub id="hubhub-frame"></iframe>`;
         document.body.appendChild(framewrap);
+
+        console.log('embedded wix iframe...', this.pubsubService);
 
         window.addEventListener("message", message => {
             if (message.data.pubsub) {
