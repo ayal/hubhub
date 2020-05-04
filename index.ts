@@ -1,15 +1,21 @@
 `use strict`
-function hubhub_uuidv4():string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
+function hubhub_uuidv4(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
     });
 }
 
+interface MsgType {
+    self: boolean;
+    msg: string;
+    sender_id: string;
+}
+
 interface HubHubType {
-    onMessageCB(msg:string): void;
-    subscribe(x:string, cb: (msg: string) => void): void,
-    sendMessage(x:string): void;
+    onMessageCB(msg: MsgType): void;
+    subscribe(x: string, cb: (msg: MsgType) => void): void,
+    sendMessage(x: string): void;
     room?: string;
     pubsubService?: string;
     sender_id?: string;
@@ -18,7 +24,7 @@ interface HubHubType {
 class HubHub implements HubHubType {
     sender_id = '';
     pubsubService = '';
-    onMessageCB = (msg: string) => {};
+    onMessageCB = (msg: MsgType) => { };
     room = '';
 
     constructor(pubsubService: string) {
@@ -28,7 +34,7 @@ class HubHub implements HubHubType {
     }
 
 
-    subscribe(room:string, cb: (msg: string) => void ){
+    subscribe(room: string, cb: (msg: MsgType) => void) {
         if (this.room) {
             console.log("already subscribed to a room:", this.room);
             return;
@@ -60,7 +66,7 @@ class HubHub implements HubHubType {
         });
     }
 
-    sendMessage(msg:string) {
+    sendMessage(msg: string) {
         if (!msg) {
             return;
         }
