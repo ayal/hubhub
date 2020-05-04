@@ -11,7 +11,7 @@
   "scripts": {
     "build": "rm -rf dist && webpack --config webpack.config.js",
     "buildtsc": "rm -rf dist && tsc",
-    "pub": "git commit -am \"pre-publish\" && npm version patch && npm publish && git commit -am \"publish\" && gp"
+    "pub": "git commit -am \"pre-publish\" && npm version patch && npm publish && git add dist && git commit -am \"publish\" && gp"
   },
   "repository": {
     "type": "git",
