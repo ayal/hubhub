@@ -1,13 +1,27 @@
 `use strict`
-const PUBSUB_WIX_SERVICE = `https://ayalg5.wixsite.com`;
 const hubhub_uuidv4 = () => {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 }
 
-class HubHub {
-    constructor(pubsubService = PUBSUB_WIX_SERVICE) {
+interface HubHubType {
+    new(string): HubHubType;
+    onMessageCB(): void;
+    subscribe(string, cb: (msg: string) => void): void,
+    sendMessage(string): void;
+    room?: string;
+    pubsubService?: string;
+    sender_id?: string;
+}
+
+class HubHub implements HubHubType {
+    sender_id;
+    pubsubService;
+    onMessageCB;
+    room;
+
+    constructor(pubsubService:string) {
         this.pubsubService = pubsubService;
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
