@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "build": "rm -rf dist && webpack --config webpack.config.js",
+    "buildtsc": "rm -rf dist && tsc",
     "pub": "npm version patch && npm publish"
   },
   "repository": {
