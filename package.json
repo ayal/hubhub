@@ -4,6 +4,7 @@
   "description": "uses a WIX website in iframe for free pubsub service",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "module": "dist/index.d.ts",
   "files": [
     "dist"
   ],
