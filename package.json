@@ -5,7 +5,7 @@
   "main": "dist/hubhub.js",
   "module": "index.js",
   "scripts": {
-    "build": "npm version patch && webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",
@@ -15,6 +15,8 @@
   "license": "ISC",
   "homepage": "https://github.com/ayal/hubhub#readme",
   "devDependencies": {
+    "ts-loader": "^7.0.2",
+    "typescript": "^3.8.3",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
   }
