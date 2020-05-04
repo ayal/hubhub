@@ -22,7 +22,7 @@ var HubHub = /** @class */ (function () {
             return;
         }
         this.onMessageCB = cb;
-        console.log('embedding wix iframe...', this.pubsubService, this.room);
+        console.log('... embedding wix iframe...', this.pubsubService, this.room);
         this.room = room;
         var framewrap = document.createElement('div');
         framewrap.hidden = true;

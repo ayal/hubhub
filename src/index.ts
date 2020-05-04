@@ -42,7 +42,7 @@ export class HubHub implements HubHubType {
 
         this.onMessageCB = cb;
 
-        console.log('embedding wix iframe...', this.pubsubService, this.room);
+        console.log('... embedding wix iframe...', this.pubsubService, this.room);
 
         this.room = room;
         const framewrap = document.createElement('div');
