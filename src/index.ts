@@ -19,22 +19,26 @@ export interface HubHubType {
     room?: string;
     pubsubService?: string;
     sender_id?: string;
+    ready: Promise<boolean>;
 }
 
 export class HubHub implements HubHubType {
-    sender_id = '';
-    pubsubService = '';
+    sender_id?= ''
+    pubsubService?= '';
     onMessageCB = (msg: MsgType) => { };
-    room = '';
+    room?= '';
+    ready: Promise<boolean>;
+    resolveReady?: () => void;
 
     constructor(pubsubService: string) {
         this.pubsubService = pubsubService;
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
+        this.ready = new Promise(resolve => this.resolveReady = resolve);
     }
 
 
-    subscribe(room: string, cb: (msg: MsgType) => void) {
+     subscribe(room: string, cb: (msg: MsgType) => void) {
         if (this.room) {
             console.log("already subscribed to a room:", this.room);
             return;
@@ -54,6 +58,11 @@ export class HubHub implements HubHubType {
         console.log('embedded wix iframe...', this.pubsubService);
 
         window.addEventListener("message", message => {
+            if (message.data.pubsubready) {
+                console.log('got ready message');
+                this.resolveReady && this.resolveReady();
+            }
+
             if (message.data.pubsub) {
                 const msg = JSON.parse(message.data.pubsub.payload);
                 if (msg.sender_id === this.sender_id) { // filter myself
@@ -66,7 +75,10 @@ export class HubHub implements HubHubType {
         });
     }
 
-    sendMessage(msg: string) {
+    async sendMessage(msg: string) {
+        console.log('want to send message, waiting for ready...');
+        await this.ready;
+        console.log('ready! sending', msg);
         if (!msg) {
             return;
         }

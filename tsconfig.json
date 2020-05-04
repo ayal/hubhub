@@ -5,7 +5,7 @@
         "declaration": true,
         "module": "es6",
         "strict": true,
-        "target": "es5",
+        "target": "es2015",
         "jsx": "react",
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
