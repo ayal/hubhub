@@ -45,6 +45,8 @@ export class HubHub implements HubHubType {
         }
 
         if (document.getElementById('hubhub-frame-wrap')) {
+            // already embedded so make sure ready
+            this.resolveReady && this.resolveReady();
             console.warn('hubhub: not embedding twice');
             return;
         }
@@ -60,7 +62,7 @@ export class HubHub implements HubHubType {
         framewrap.innerHTML = `<iframe src="${this.pubsubService}?room=${room}" title="hubhub id="hubhub-frame"></iframe>`;
         document.body.appendChild(framewrap);
 
-        console.log('embedded wix iframe...', this.pubsubService);
+        console.log('hubhub: embedded wix iframe...', this.pubsubService);
 
         window.addEventListener("message", message => {
             if (message.data.pubsubready) {
