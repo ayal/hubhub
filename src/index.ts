@@ -40,7 +40,12 @@ export class HubHub implements HubHubType {
 
      subscribe(room: string, cb: (msg: MsgType) => void) {
         if (this.room) {
-            console.log("already subscribed to a room:", this.room);
+            console.log("hubhub: already subscribed to a room:", this.room);
+            return;
+        }
+
+        if (document.getElementById('hubhub-frame-wrap')) {
+            console.warn('hubhub: not embedding twice');
             return;
         }
 
@@ -65,6 +70,7 @@ export class HubHub implements HubHubType {
 
             if (message.data.pubsub) {
                 const msg = JSON.parse(message.data.pubsub.payload);
+                msg.self = false;
                 if (msg.sender_id === this.sender_id) { // filter myself
                     msg.self = true;
                 }
