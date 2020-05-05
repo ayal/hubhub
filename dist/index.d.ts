@@ -9,7 +9,6 @@ export interface HubHubType {
     subscribe(x: string, cb: (msg: MsgType) => void): void;
     sendMessage(x: string): void;
     room?: string;
-    pubsubService?: string;
     sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;

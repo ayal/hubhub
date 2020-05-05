@@ -78,6 +78,5 @@ class HubHub {
     }
 }
 const hubhub = new HubHub();
-Object.freeze(hubhub);
 export default hubhub;
 //# sourceMappingURL=index.js.map
