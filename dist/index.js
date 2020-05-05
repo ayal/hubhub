@@ -72,7 +72,7 @@ class HubHub {
             if (!msg) {
                 return;
             }
-            const msgstring = JSON.stringify({ sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4() });
+            const msgstring = JSON.stringify({ sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime() });
             fetch(`${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`);
         });
     }
