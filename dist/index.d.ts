@@ -1,5 +1,4 @@
 export interface MsgType {
-    self: boolean;
     msg: string;
     sender_id?: string;
     msg_id: string;
