@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 `use strict`;
 function hubhub_uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -67,14 +58,14 @@ class HubHub {
         });
     }
     sendMessage(msg) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('hubhub: sending', msg);
-            if (!msg) {
-                return;
-            }
-            const msgstring = JSON.stringify({ sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime() });
-            fetch(`${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`);
-        });
+        console.log('hubhub: sending', msg);
+        if (!msg) {
+            return;
+        }
+        const msgobj = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime(), status: 'sending' };
+        const msgstring = JSON.stringify(msgobj);
+        fetch(`${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`);
+        return msgobj;
     }
 }
 const hubhub = new HubHub();

@@ -12,6 +12,7 @@ export interface MsgType {
     sender_id: string;
     msg_id: string;
     msg_time: number;
+    status?:string;
 }
 
 export interface HubHubType {
@@ -91,15 +92,17 @@ class HubHub implements HubHubType {
         });
     }
 
-    async sendMessage(msg: string) {
+    sendMessage(msg: string) {
         console.log('hubhub: sending', msg);
         if (!msg) {
             return;
         }
-        const msgstring = JSON.stringify({ sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime() })
+        const msgobj = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime(), status: 'sending' };
+        const msgstring = JSON.stringify(msgobj);
         fetch(
             `${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`
         );
+        return msgobj;
     }
 }
 
