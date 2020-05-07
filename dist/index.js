@@ -43,8 +43,8 @@ class HubHub {
         console.log('hubhub: will listen to messages');
         window.addEventListener("message", message => {
             if (message.data.pubsuball) {
-                const msgs = message.data.pubsub.payload;
-                console.log("hubhub: got past messages", message.data.pubsub);
+                const msgs = message.data.pubsuball;
+                console.log("hubhub: got past messages", msgs);
                 msgs.forEach((msg) => {
                     this.onMessageCB && this.onMessageCB(msg);
                 });
