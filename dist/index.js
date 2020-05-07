@@ -52,6 +52,9 @@ class HubHub {
                 if (msg.sender_id === this.sender_id) { // filter myself
                     msg.self = true;
                 }
+                else {
+                    msg.self = false;
+                }
                 console.log("hubhub: got message", message.data.pubsub);
                 this.onMessageCB && this.onMessageCB(msg);
             }
@@ -62,7 +65,7 @@ class HubHub {
         if (!msg) {
             return;
         }
-        const msgobj = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime(), status: 'sending' };
+        const msgobj = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime(), status: 'sending', self: true };
         const msgstring = JSON.stringify(msgobj);
         fetch(`${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`);
         return msgobj;

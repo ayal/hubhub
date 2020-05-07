@@ -31,6 +31,7 @@ declare class HubHub implements HubHubType {
         msg_id: string;
         msg_time: number;
         status: string;
+        self: boolean;
     } | undefined;
 }
 declare const hubhub: HubHub;
