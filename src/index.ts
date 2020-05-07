@@ -9,16 +9,16 @@ function hubhub_uuidv4(): string {
 export interface MsgType {
     self: boolean;
     msg: string;
-    sender_id: string;
+    sender_id?: string;
     msg_id: string;
     msg_time: number;
-    status?:string;
+    status?: string;
 }
 
 export interface HubHubType {
     onMessageCB(msg: MsgType): void;
     subscribe(x: string, cb: (msg: MsgType) => void): void,
-    sendMessage(x: string): void;
+    sendMessage(x: string): MsgType | undefined;
     room?: string;
     sender_id?: string;
     ready: Promise<boolean>;
@@ -100,7 +100,7 @@ class HubHub implements HubHubType {
         if (!msg) {
             return;
         }
-        const msgobj = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime(), status: 'sending', self:true };
+        const msgobj: MsgType = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime(), status: 'sending', self: true };
         const msgstring = JSON.stringify(msgobj);
         fetch(
             `${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`
