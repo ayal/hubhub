@@ -73,13 +73,21 @@ class HubHub implements HubHubType {
         // prevent doubles
         console.log('hubhub: will listen to messages');
         window.addEventListener("message", message => {
+            if (message.data.pubsuball) {
+                const msgs = message.data.pubsub.payload;
+                console.log("hubhub: got past messages", message.data.pubsub);
+                msgs.forEach((msg:MsgType)=>{
+                    this.onMessageCB && this.onMessageCB(msg);
+                })
+            }
+
             if (message.data.pubsubready) {
-                console.log('got ready message');
+                console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
             }
 
             if (message.data.pubsub) {
-                const msg = JSON.parse(message.data.pubsub.payload);
+                const msg = message.data.pubsub.payload;
                 console.log("hubhub: got message", message.data.pubsub);
                 this.onMessageCB && this.onMessageCB(msg);
 
