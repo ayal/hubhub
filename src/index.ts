@@ -14,7 +14,7 @@ export interface MsgType {
 }
 
 export interface HubHubType {
-    onMessageCB(msg: MsgType): void;
+    onMessageCB(msgs: Array<MsgType>): void;
     subscribe(x: string, cb: (msg: MsgType) => void): void,
     sendMessage(x: string): MsgType | undefined;
     room?: string;
@@ -26,7 +26,7 @@ export interface HubHubType {
 class HubHub implements HubHubType {
     sender_id?= ''
     public pubsubService?= '';
-    onMessageCB = (msg: MsgType) => { };
+    onMessageCB = (msgs: Array<MsgType>) => { };
     room?= '';
     ready: Promise<boolean>;
     resolveReady?: () => void;
@@ -75,9 +75,7 @@ class HubHub implements HubHubType {
             if (message.data.pubsuball) {
                 const msgs = message.data.pubsuball;
                 console.log("hubhub: got past messages", msgs);
-                msgs.forEach((msg: MsgType) => {
-                    this.onMessageCB && this.onMessageCB(msg);
-                })
+                this.onMessageCB && this.onMessageCB(msgs);
             }
 
             if (message.data.pubsubready) {
@@ -88,7 +86,7 @@ class HubHub implements HubHubType {
             if (message.data.pubsub) {
                 const msg = message.data.pubsub.payload;
                 console.log("hubhub: got message", message.data.pubsub);
-                this.onMessageCB && this.onMessageCB(msg);
+                this.onMessageCB && this.onMessageCB([msg]);
 
             }
         });

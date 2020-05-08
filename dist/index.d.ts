@@ -5,7 +5,7 @@ export interface MsgType {
     msg_time: number;
 }
 export interface HubHubType {
-    onMessageCB(msg: MsgType): void;
+    onMessageCB(msgs: Array<MsgType>): void;
     subscribe(x: string, cb: (msg: MsgType) => void): void;
     sendMessage(x: string): MsgType | undefined;
     room?: string;
@@ -16,7 +16,7 @@ export interface HubHubType {
 declare class HubHub implements HubHubType {
     sender_id?: string | undefined;
     pubsubService?: string | undefined;
-    onMessageCB: (msg: MsgType) => void;
+    onMessageCB: (msgs: MsgType[]) => void;
     room?: string | undefined;
     ready: Promise<boolean>;
     resolveReady?: () => void;

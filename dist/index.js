@@ -9,7 +9,7 @@ class HubHub {
     constructor() {
         this.sender_id = '';
         this.pubsubService = '';
-        this.onMessageCB = (msg) => { };
+        this.onMessageCB = (msgs) => { };
         this.room = '';
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
@@ -45,9 +45,7 @@ class HubHub {
             if (message.data.pubsuball) {
                 const msgs = message.data.pubsuball;
                 console.log("hubhub: got past messages", msgs);
-                msgs.forEach((msg) => {
-                    this.onMessageCB && this.onMessageCB(msg);
-                });
+                this.onMessageCB && this.onMessageCB(msgs);
             }
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
@@ -56,7 +54,7 @@ class HubHub {
             if (message.data.pubsub) {
                 const msg = message.data.pubsub.payload;
                 console.log("hubhub: got message", message.data.pubsub);
-                this.onMessageCB && this.onMessageCB(msg);
+                this.onMessageCB && this.onMessageCB([msg]);
             }
         });
     }
