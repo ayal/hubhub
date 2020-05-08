@@ -3,7 +3,6 @@ export interface MsgType {
     sender_id?: string;
     msg_id: string;
     msg_time: number;
-    status?: string;
 }
 export interface HubHubType {
     onMessageCB(msg: MsgType): void;
