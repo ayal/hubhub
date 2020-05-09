@@ -58,14 +58,14 @@ class HubHub {
             }
         });
     }
-    sendMessage(msg) {
+    sendMessage(msg, persist = true) {
         console.log('hubhub: sending', msg);
         if (!msg) {
             return;
         }
         const msgobj = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime() };
         const msgstring = JSON.stringify(msgobj);
-        fetch(`${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`);
+        fetch(`${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}&persist=${persist}`);
         return msgobj;
     }
 }

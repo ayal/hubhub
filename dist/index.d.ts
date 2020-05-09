@@ -6,8 +6,8 @@ export interface MsgType {
 }
 export interface HubHubType {
     onMessageCB(msgs: Array<MsgType>): void;
-    subscribe(x: string, cb: (msg: MsgType) => void): void;
-    sendMessage(x: string): MsgType | undefined;
+    subscribe(x: string, cb: (msgs: Array<MsgType>) => void): void;
+    sendMessage(x: string, p: boolean): MsgType | undefined;
     room?: string;
     sender_id?: string;
     ready: Promise<boolean>;
@@ -22,8 +22,8 @@ declare class HubHub implements HubHubType {
     resolveReady?: () => void;
     constructor();
     init(pubsubService: string): void;
-    subscribe(room: string, cb: (msg: MsgType) => void): void;
-    sendMessage(msg: string): MsgType | undefined;
+    subscribe(room: string, cb: (msgs: Array<MsgType>) => void): void;
+    sendMessage(msg: string, persist?: boolean): MsgType | undefined;
 }
 declare const hubhub: HubHub;
 export default hubhub;

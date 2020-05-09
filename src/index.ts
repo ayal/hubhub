@@ -15,8 +15,8 @@ export interface MsgType {
 
 export interface HubHubType {
     onMessageCB(msgs: Array<MsgType>): void;
-    subscribe(x: string, cb: (msg: MsgType) => void): void,
-    sendMessage(x: string): MsgType | undefined;
+    subscribe(x: string, cb: (msgs: Array<MsgType>) => void): void,
+    sendMessage(x: string, p:boolean): MsgType | undefined;
     room?: string;
     sender_id?: string;
     ready: Promise<boolean>;
@@ -42,7 +42,7 @@ class HubHub implements HubHubType {
     }
 
 
-    subscribe(room: string, cb: (msg: MsgType) => void) {
+    subscribe(room: string, cb: (msgs: Array<MsgType>) => void) {
         if (this.room) {
             console.log("hubhub: already subscribed to a room:", this.room);
             return;
@@ -92,7 +92,7 @@ class HubHub implements HubHubType {
         });
     }
 
-    sendMessage(msg: string) {
+    sendMessage(msg: string, persist=true) {
         console.log('hubhub: sending', msg);
         if (!msg) {
             return;
@@ -100,7 +100,7 @@ class HubHub implements HubHubType {
         const msgobj: MsgType = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime()};
         const msgstring = JSON.stringify(msgobj);
         fetch(
-            `${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}`
+            `${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}&persist=${persist}`
         );
         return msgobj;
     }
