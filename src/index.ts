@@ -17,6 +17,7 @@ export interface HubHubType {
     onMessageCB(msgs: Array<MsgType>): void;
     subscribe(x: string, cb: (msgs: Array<MsgType>) => void): void,
     sendMessage(x: string, p:boolean): MsgType | undefined;
+    get(room:string, skip:number):Promise<Array<MsgType>>;
     room?: string;
     sender_id?: string;
     ready: Promise<boolean>;
@@ -39,6 +40,13 @@ class HubHub implements HubHubType {
 
     init(pubsubService: string) {
         this.pubsubService = pubsubService;
+    }
+
+    async get(room: string, skip=0) {
+        const res = await fetch(
+            `${this.pubsubService}/_functions/pubsubget?room=${this.room}&skip=${skip}`
+        );
+        return res.json();
     }
 
 
