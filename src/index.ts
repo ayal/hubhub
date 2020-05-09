@@ -43,9 +43,13 @@ class HubHub implements HubHubType {
     }
 
     async get(room: string, skip=0) {
+        console.log('hubhub: getting', room, skip);
+
         const res = await fetch(
             `${this.pubsubService}/_functions/pubsubget?room=${this.room}&skip=${skip}`
         );
+
+        console.log('hubhub: get response', res);
         return res.json();
     }
 

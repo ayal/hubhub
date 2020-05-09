@@ -29,7 +29,9 @@ class HubHub {
     }
     get(room, skip = 0) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('hubhub: getting', room, skip);
             const res = yield fetch(`${this.pubsubService}/_functions/pubsubget?room=${this.room}&skip=${skip}`);
+            console.log('hubhub: get response', res);
             return res.json();
         });
     }
