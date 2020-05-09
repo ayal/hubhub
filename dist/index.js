@@ -85,6 +85,9 @@ class HubHub {
         fetch(`${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}&persist=${persist}`);
         return msgobj;
     }
+    see(msg_id) {
+        fetch(`${this.pubsubService}/_functions/pubsubsee?msg_id=${msg_id}&sender_id=${this.sender_id}`);
+    }
 }
 const hubhub = new HubHub();
 export default hubhub;

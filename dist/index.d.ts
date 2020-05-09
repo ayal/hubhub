@@ -26,6 +26,7 @@ declare class HubHub implements HubHubType {
     get(room: string, skip?: number): Promise<any>;
     subscribe(room: string, cb: (msgs: Array<MsgType>) => void): void;
     sendMessage(msg: string, persist?: boolean): MsgType | undefined;
+    see(msg_id: string): void;
 }
 declare const hubhub: HubHub;
 export default hubhub;

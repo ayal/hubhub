@@ -116,6 +116,12 @@ class HubHub implements HubHubType {
         );
         return msgobj;
     }
+
+    see(msg_id:string) {
+        fetch(
+            `${this.pubsubService}/_functions/pubsubsee?msg_id=${msg_id}&sender_id=${this.sender_id}`
+        );
+    }
 }
 
 const hubhub = new HubHub();
