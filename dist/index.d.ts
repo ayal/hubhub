@@ -1,32 +1,32 @@
-export interface MsgType {
-    msg: string;
+export interface DocType {
+    data: string;
     sender_id?: string;
-    msg_id: string;
-    msg_time: number;
+    doc_id: string;
+    time: number;
 }
 export interface HubHubType {
-    onMessageCB(msgs: Array<MsgType>): void;
-    subscribe(x: string, cb: (msgs: Array<MsgType>) => void): void;
-    sendMessage(x: string, p: boolean): MsgType | undefined;
-    get(room: string, skip: number): Promise<Array<MsgType>>;
-    room?: string;
+    on(collection: string, cb: (docs: Array<DocType>) => void): void;
+    get(collection: string, skip: number): Promise<Array<DocType>>;
+    set(collection: string, data: any, persist: boolean): DocType | undefined;
     sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;
 }
+interface Callbacks {
+    [collection: string]: (docs: Array<DocType>) => void;
+}
 declare class HubHub implements HubHubType {
+    onMessageCB: Callbacks;
     sender_id?: string | undefined;
     pubsubService?: string | undefined;
-    onMessageCB: (msgs: MsgType[]) => void;
-    room?: string | undefined;
     ready: Promise<boolean>;
     resolveReady?: () => void;
     constructor();
     init(pubsubService: string): void;
-    get(room: string, skip?: number): Promise<any>;
-    subscribe(room: string, cb: (msgs: Array<MsgType>) => void): void;
-    sendMessage(msg: string, persist?: boolean): MsgType | undefined;
-    see(msg_id: string): void;
+    get(collection: string, skip?: number): Promise<any>;
+    on(collection: string, cb: (docs: Array<DocType>) => void): void;
+    set(collection: string, data: any, persist?: boolean): DocType | undefined;
+    update(doc_id: string, data: any): void;
 }
 declare const hubhub: HubHub;
 export default hubhub;

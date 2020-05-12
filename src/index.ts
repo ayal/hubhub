@@ -6,29 +6,30 @@ function hubhub_uuidv4(): string {
     });
 }
 
-export interface MsgType {
-    msg: string;
+export interface DocType {
+    data: string;
     sender_id?: string;
-    msg_id: string;
-    msg_time: number;
+    doc_id: string;
+    time: number;
 }
 
 export interface HubHubType {
-    onMessageCB(msgs: Array<MsgType>): void;
-    subscribe(x: string, cb: (msgs: Array<MsgType>) => void): void,
-    sendMessage(x: string, p:boolean): MsgType | undefined;
-    get(room:string, skip:number):Promise<Array<MsgType>>;
-    room?: string;
+    on(collection:string, cb: (docs: Array<DocType>) => void): void,
+    get(collection:string, skip:number):Promise<Array<DocType>>;
+    set(collection:string, data:any, persist:boolean):DocType|undefined;
     sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;
 }
 
+interface Callbacks {
+    [collection:string]:(docs: Array<DocType>) => void;
+}
+
 class HubHub implements HubHubType {
+    onMessageCB: Callbacks = {};
     sender_id?= ''
     public pubsubService?= '';
-    onMessageCB = (msgs: Array<MsgType>) => { };
-    room?= '';
     ready: Promise<boolean>;
     resolveReady?: () => void;
 
@@ -40,27 +41,6 @@ class HubHub implements HubHubType {
 
     init(pubsubService: string) {
         this.pubsubService = pubsubService;
-    }
-
-    async get(room: string, skip=0) {
-        console.log('hubhub: getting', room, skip);
-
-        const res = await fetch(
-            `${this.pubsubService}/_functions/pubsubget?room=${this.room}&skip=${skip}`
-        );
-
-        console.log('hubhub: get response', res);
-        return res.json();
-    }
-
-
-    subscribe(room: string, cb: (msgs: Array<MsgType>) => void) {
-        if (this.room) {
-            console.log("hubhub: already subscribed to a room:", this.room);
-            return;
-        }
-
-        this.onMessageCB = cb;
 
         if (document.getElementById('hubhub-frame-wrap')) {
             // already embedded so make sure ready
@@ -69,59 +49,76 @@ class HubHub implements HubHubType {
         }
         else {
 
-            console.log('... embedding wix iframe...', this.pubsubService, this.room);
+            console.log('... embedding wix iframe...', this.pubsubService);
 
-            this.room = room;
             const framewrap = document.createElement('div');
             framewrap.hidden = true;
             framewrap.id = 'hubhub-frame-wrap';
-            framewrap.innerHTML = `<iframe src="${this.pubsubService}?room=${room}" title="hubhub id="hubhub-frame"></iframe>`;
+            framewrap.innerHTML = `<iframe src="${this.pubsubService}" title="hubhub id="hubhub-frame"></iframe>`;
             document.body.appendChild(framewrap);
 
             console.log('hubhub: embedded wix iframe...', this.pubsubService);
         }
 
-        // prevent doubles
-        console.log('hubhub: will listen to messages');
-        window.addEventListener("message", message => {
-            if (message.data.pubsuball) {
-                const msgs = message.data.pubsuball;
-                console.log("hubhub: got past messages", msgs);
-                this.onMessageCB && this.onMessageCB(msgs);
-            }
-
-            if (message.data.pubsubready) {
-                console.log('hubhub: got ready message');
-                this.resolveReady && this.resolveReady();
-            }
-
-            if (message.data.pubsub) {
-                const msg = message.data.pubsub.payload;
-                console.log("hubhub: got message", message.data.pubsub);
-                this.onMessageCB && this.onMessageCB([msg]);
-
-            }
-        });
+         // prevent doubles
+         console.log('hubhub: will listen to messages');
+         window.addEventListener("message", message => {
+             if (message.data.pubsuball) {
+                 const docs = message.data.pubsuball;
+                 console.log("hubhub: got past messages", docs);
+                 this.onMessageCB && this.onMessageCB[message.data.pubsuball.collection](docs);
+             }
+ 
+             if (message.data.pubsubready) {
+                 console.log('hubhub: got ready message');
+                 this.resolveReady && this.resolveReady();
+             }
+ 
+             if (message.data.pubsub) {
+                 const doc = message.data.pubsub.payload;
+                 console.log("hubhub: got message", message.data.pubsub);
+                 this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
+ 
+             }
+         });
     }
 
-    sendMessage(msg: string, persist=true) {
-        console.log('hubhub: sending', msg);
-        if (!msg) {
+    async get(collection:string, skip=0) {
+        console.log('hubhub: getting', collection, skip);
+
+        const res = await fetch(
+            `${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}`
+        );
+
+        console.log('hubhub: get response', res);
+        return res.json();
+    }
+
+
+    on(collection:string, cb: (docs: Array<DocType>) => void) {
+        this.onMessageCB[collection] = cb; 
+    }
+
+    set(collection: string, data:any, persist=true) {
+        console.log('hubhub: sending', data);
+        if (!data) {
             return;
         }
-        const msgobj: MsgType = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime()};
-        const msgstring = JSON.stringify(msgobj);
+        const docobj: DocType = { sender_id: this.sender_id, data:JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime()};
+        const docstring = JSON.stringify(docobj);
         fetch(
-            `${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}&persist=${persist}`
+            `${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}`
         );
-        return msgobj;
+        return docobj;
     }
 
-    see(msg_id:string) {
+
+    update(doc_id:string, data:any) {
         fetch(
-            `${this.pubsubService}/_functions/pubsubsee?msg_id=${msg_id}&sender_id=${this.sender_id}`
+            `${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&sender_id=${this.sender_id}&data=${data}`
         );
     }
+
 }
 
 const hubhub = new HubHub();

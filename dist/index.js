@@ -16,43 +16,26 @@ function hubhub_uuidv4() {
 }
 class HubHub {
     constructor() {
+        this.onMessageCB = {};
         this.sender_id = '';
         this.pubsubService = '';
-        this.onMessageCB = (msgs) => { };
-        this.room = '';
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
     }
     init(pubsubService) {
         this.pubsubService = pubsubService;
-    }
-    get(room, skip = 0) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('hubhub: getting', room, skip);
-            const res = yield fetch(`${this.pubsubService}/_functions/pubsubget?room=${this.room}&skip=${skip}`);
-            console.log('hubhub: get response', res);
-            return res.json();
-        });
-    }
-    subscribe(room, cb) {
-        if (this.room) {
-            console.log("hubhub: already subscribed to a room:", this.room);
-            return;
-        }
-        this.onMessageCB = cb;
         if (document.getElementById('hubhub-frame-wrap')) {
             // already embedded so make sure ready
             this.resolveReady && this.resolveReady();
             console.warn('hubhub: not embedding twice');
         }
         else {
-            console.log('... embedding wix iframe...', this.pubsubService, this.room);
-            this.room = room;
+            console.log('... embedding wix iframe...', this.pubsubService);
             const framewrap = document.createElement('div');
             framewrap.hidden = true;
             framewrap.id = 'hubhub-frame-wrap';
-            framewrap.innerHTML = `<iframe src="${this.pubsubService}?room=${room}" title="hubhub id="hubhub-frame"></iframe>`;
+            framewrap.innerHTML = `<iframe src="${this.pubsubService}" title="hubhub id="hubhub-frame"></iframe>`;
             document.body.appendChild(framewrap);
             console.log('hubhub: embedded wix iframe...', this.pubsubService);
         }
@@ -60,33 +43,44 @@ class HubHub {
         console.log('hubhub: will listen to messages');
         window.addEventListener("message", message => {
             if (message.data.pubsuball) {
-                const msgs = message.data.pubsuball;
-                console.log("hubhub: got past messages", msgs);
-                this.onMessageCB && this.onMessageCB(msgs);
+                const docs = message.data.pubsuball;
+                console.log("hubhub: got past messages", docs);
+                this.onMessageCB && this.onMessageCB[message.data.pubsuball.collection](docs);
             }
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
             }
             if (message.data.pubsub) {
-                const msg = message.data.pubsub.payload;
+                const doc = message.data.pubsub.payload;
                 console.log("hubhub: got message", message.data.pubsub);
-                this.onMessageCB && this.onMessageCB([msg]);
+                this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
             }
         });
     }
-    sendMessage(msg, persist = true) {
-        console.log('hubhub: sending', msg);
-        if (!msg) {
+    get(collection, skip = 0) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('hubhub: getting', collection, skip);
+            const res = yield fetch(`${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}`);
+            console.log('hubhub: get response', res);
+            return res.json();
+        });
+    }
+    on(collection, cb) {
+        this.onMessageCB[collection] = cb;
+    }
+    set(collection, data, persist = true) {
+        console.log('hubhub: sending', data);
+        if (!data) {
             return;
         }
-        const msgobj = { sender_id: this.sender_id, msg, msg_id: hubhub_uuidv4(), msg_time: (new Date()).getTime() };
-        const msgstring = JSON.stringify(msgobj);
-        fetch(`${this.pubsubService}/_functions/pubsub?room=${this.room}&message=${msgstring}&persist=${persist}`);
-        return msgobj;
+        const docobj = { sender_id: this.sender_id, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
+        const docstring = JSON.stringify(docobj);
+        fetch(`${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}`);
+        return docobj;
     }
-    see(msg_id) {
-        fetch(`${this.pubsubService}/_functions/pubsubsee?msg_id=${msg_id}&sender_id=${this.sender_id}`);
+    update(doc_id, data) {
+        fetch(`${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&sender_id=${this.sender_id}&data=${data}`);
     }
 }
 const hubhub = new HubHub();
