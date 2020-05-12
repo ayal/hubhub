@@ -42,17 +42,13 @@ class HubHub {
         // prevent doubles
         console.log('hubhub: will listen to messages');
         window.addEventListener("message", message => {
-            if (message.data.pubsuball) {
-                const docs = message.data.pubsuball;
-                console.log("hubhub: got past messages", docs);
-                this.onMessageCB && this.onMessageCB[message.data.pubsuball.collection](docs);
-            }
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
             }
             if (message.data.pubsub) {
                 const doc = message.data.pubsub.payload;
+                doc.data = JSON.parse(doc.data);
                 console.log("hubhub: got message", message.data.pubsub);
                 this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
             }
