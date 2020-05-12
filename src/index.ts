@@ -46,6 +46,7 @@ class HubHub implements HubHubType {
             // already embedded so make sure ready
             this.resolveReady && this.resolveReady();
             console.warn('hubhub: not embedding twice');
+            return;
         }
         else {
 
