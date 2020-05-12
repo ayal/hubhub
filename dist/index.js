@@ -68,6 +68,7 @@ class HubHub {
     }
     on(collection, cb) {
         this.onMessageCB[collection] = cb;
+        fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}`);
     }
     set(collection, data, persist = true) {
         console.log('hubhub: sending', data);

@@ -97,6 +97,9 @@ class HubHub implements HubHubType {
 
     on(collection:string, cb: (docs: Array<DocType>) => void) {
         this.onMessageCB[collection] = cb; 
+        fetch(
+            `${this.pubsubService}/_functions/pubsubsub?collection=${collection}`
+        );
     }
 
     set(collection: string, data:any, persist=true) {
