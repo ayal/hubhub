@@ -14,16 +14,16 @@ export interface DocType {
 }
 
 export interface HubHubType {
-    on(collection:string, cb: (docs: Array<DocType>) => void): void,
-    get(collection:string, skip:number):Promise<Array<DocType>>;
-    set(collection:string, data:any, persist:boolean):DocType|undefined;
+    on(collection: string, cb: (docs: Array<DocType>) => void): void,
+    get(collection: string, skip: number): Promise<Array<DocType>>;
+    set(collection: string, data: any, persist: boolean): DocType | undefined;
     sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;
 }
 
 interface Callbacks {
-    [collection:string]:(docs: Array<DocType>) => void;
+    [collection: string]: (docs: Array<DocType>) => void;
 }
 
 class HubHub implements HubHubType {
@@ -60,49 +60,53 @@ class HubHub implements HubHubType {
             console.log('hubhub: embedded wix iframe...', this.pubsubService);
         }
 
-         // prevent doubles
-         console.log('hubhub: will listen to messages');
-         window.addEventListener("message", message => { 
-             if (message.data.pubsubready) {
-                 console.log('hubhub: got ready message');
-                 this.resolveReady && this.resolveReady();
-             }
- 
-             if (message.data.pubsub) {
-                 const doc = message.data.pubsub.payload;
-                 doc.data = JSON.parse(doc.data);
-                 console.log("hubhub: got message", message.data.pubsub);
-                 this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
- 
-             }
-         });
+        // prevent doubles
+        console.log('hubhub: will listen to messages');
+        window.addEventListener("message", message => {
+            if (message.data.pubsubready) {
+                console.log('hubhub: got ready message');
+                this.resolveReady && this.resolveReady();
+            }
+
+            if (message.data.pubsub) {
+                const doc = message.data.pubsub.payload;
+                doc.data = JSON.parse(doc.data);
+                console.log("hubhub: got message", message.data.pubsub);
+                this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
+
+            }
+        });
     }
 
-    async get(collection:string, skip=0) {
+    async get(collection: string, skip = 0) {
         console.log('hubhub: getting', collection, skip);
 
         const res = await fetch(
             `${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}`
         );
 
-        console.log('hubhub: get response', res);
-        return res.json();
+        console.log('hubhub: get response', res;
+        const docs = await res.json();
+        return docs.map((doc:any) => {
+          doc.data = JSON.parse(doc.data);
+          return doc;
+        });
     }
 
 
-    on(collection:string, cb: (docs: Array<DocType>) => void) {
-        this.onMessageCB[collection] = cb; 
+    on(collection: string, cb: (docs: Array<DocType>) => void) {
+        this.onMessageCB[collection] = cb;
         fetch(
             `${this.pubsubService}/_functions/pubsubsub?collection=${collection}`
         );
     }
 
-    set(collection: string, data:any, persist=true) {
+    set(collection: string, data: any, persist = true) {
         console.log('hubhub: sending', data);
         if (!data) {
             return;
         }
-        const docobj: DocType = { sender_id: this.sender_id, data:JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime()};
+        const docobj: DocType = { sender_id: this.sender_id, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
         const docstring = JSON.stringify(docobj);
         fetch(
             `${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}`
@@ -111,7 +115,7 @@ class HubHub implements HubHubType {
     }
 
 
-    update(doc_id:string, data:any) {
+    update(doc_id: string, data: any) {
         fetch(
             `${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&sender_id=${this.sender_id}&data=${data}`
         );

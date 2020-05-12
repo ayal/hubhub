@@ -59,7 +59,11 @@ class HubHub {
             console.log('hubhub: getting', collection, skip);
             const res = yield fetch(`${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}`);
             console.log('hubhub: get response', res);
-            return res.json();
+            const docs = yield res.json();
+            return docs.map((doc) => {
+                doc.data = JSON.parse(doc.data);
+                return doc;
+            });
         });
     }
     on(collection, cb) {
