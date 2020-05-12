@@ -85,7 +85,7 @@ class HubHub implements HubHubType {
             `${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}`
         );
 
-        console.log('hubhub: get response', res;
+        console.log('hubhub: get response', res);
         const docs = await res.json();
         return docs.map((doc:any) => {
           doc.data = JSON.parse(doc.data);
