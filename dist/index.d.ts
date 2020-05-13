@@ -11,6 +11,7 @@ export interface HubHubType {
     sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;
+    kill(): void;
 }
 interface Callbacks {
     [collection: string]: (docs: Array<DocType>) => void;
@@ -22,7 +23,9 @@ declare class HubHub implements HubHubType {
     ready: Promise<boolean>;
     resolveReady?: () => void;
     constructor();
+    handler(message: any): void;
     init(pubsubService: string): void;
+    kill(): void;
     get(collection: string, skip?: number): Promise<any>;
     on(collection: string, cb: (docs: Array<DocType>) => void): void;
     set(collection: string, data: any, persist?: boolean): DocType | undefined;

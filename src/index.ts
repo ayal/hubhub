@@ -20,6 +20,7 @@ export interface HubHubType {
     sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;
+    kill():void;
 }
 
 interface Callbacks {
@@ -39,7 +40,23 @@ class HubHub implements HubHubType {
         this.ready = new Promise(resolve => this.resolveReady = resolve);
     }
 
+    handler(message:any) {
+        if (message.data.pubsubready) {
+            console.log('hubhub: got ready message');
+            this.resolveReady && this.resolveReady();
+        }
+
+        if (message.data.pubsub) {
+            const doc = message.data.pubsub.payload;
+            doc.data = JSON.parse(doc.data);
+            console.log("hubhub: got message", message.data.pubsub);
+            this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
+
+        }
+    }
+
     init(pubsubService: string) {
+        console.log('hubhub: initting', pubsubService);
         this.pubsubService = pubsubService;
 
         if (document.getElementById('hubhub-frame-wrap')) {
@@ -63,20 +80,12 @@ class HubHub implements HubHubType {
 
         // prevent doubles
         console.log('hubhub: will listen to messages');
-        window.addEventListener("message", message => {
-            if (message.data.pubsubready) {
-                console.log('hubhub: got ready message');
-                this.resolveReady && this.resolveReady();
-            }
+        window.addEventListener("message", this.handler);
+    }
 
-            if (message.data.pubsub) {
-                const doc = message.data.pubsub.payload;
-                doc.data = JSON.parse(doc.data);
-                console.log("hubhub: got message", message.data.pubsub);
-                this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
-
-            }
-        });
+    kill() {
+        console.log('hubhub: killing...');
+        window.removeEventListener('message', this.handler);
     }
 
     async get(collection: string, skip = 0) {

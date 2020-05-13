@@ -23,7 +23,20 @@ class HubHub {
         localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
     }
+    handler(message) {
+        if (message.data.pubsubready) {
+            console.log('hubhub: got ready message');
+            this.resolveReady && this.resolveReady();
+        }
+        if (message.data.pubsub) {
+            const doc = message.data.pubsub.payload;
+            doc.data = JSON.parse(doc.data);
+            console.log("hubhub: got message", message.data.pubsub);
+            this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
+        }
+    }
     init(pubsubService) {
+        console.log('hubhub: initting', pubsubService);
         this.pubsubService = pubsubService;
         if (document.getElementById('hubhub-frame-wrap')) {
             // already embedded so make sure ready
@@ -42,18 +55,11 @@ class HubHub {
         }
         // prevent doubles
         console.log('hubhub: will listen to messages');
-        window.addEventListener("message", message => {
-            if (message.data.pubsubready) {
-                console.log('hubhub: got ready message');
-                this.resolveReady && this.resolveReady();
-            }
-            if (message.data.pubsub) {
-                const doc = message.data.pubsub.payload;
-                doc.data = JSON.parse(doc.data);
-                console.log("hubhub: got message", message.data.pubsub);
-                this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
-            }
-        });
+        window.addEventListener("message", this.handler);
+    }
+    kill() {
+        console.log('hubhub: killing...');
+        window.removeEventListener('message', this.handler);
     }
     get(collection, skip = 0) {
         return __awaiter(this, void 0, void 0, function* () {
