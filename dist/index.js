@@ -20,13 +20,18 @@ class HubHub {
         this.sender_id = '';
         this.pubsubService = '';
         this.handler = (message) => { };
-        this.destroyed = false;
+        this.inited = false;
         console.log('hubhub ctor');
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
     }
     init(pubsubService) {
+        if (this.inited) {
+            console.log('hubhub: not initing twice');
+            return;
+        }
+        this.inited = true;
         console.log('hubhub: initting', pubsubService);
         this.pubsubService = pubsubService;
         if (document.getElementById('hubhub-frame-wrap')) {
@@ -65,9 +70,6 @@ class HubHub {
     }
     kill() {
         console.log('hubhub: killing...');
-        this.destroyed = true;
-        // send off messages to wix too or make some window singleton to hanle this differently
-        window.removeEventListener('message', this.handler);
     }
     get(collection, skip = 0) {
         return __awaiter(this, void 0, void 0, function* () {
