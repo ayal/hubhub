@@ -35,6 +35,7 @@ class HubHub implements HubHubType {
     resolveReady?: () => void;
 
     constructor() {
+        console.log('hubhub ctor');
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
@@ -80,7 +81,7 @@ class HubHub implements HubHubType {
 
         // prevent doubles
         console.log('hubhub: will listen to messages');
-        window.addEventListener("message", this.handler);
+        window.addEventListener("message", (e)=>this.handler(e));
     }
 
     kill() {
