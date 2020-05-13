@@ -111,6 +111,7 @@ class HubHub implements HubHubType {
 
 
     on(collection: string, cb: (docs: Array<DocType>) => void) {
+        console.log('hubhub: asking to subscribe to', collection);
         this.onMessageCB[collection] = cb;
         fetch(
             `${this.pubsubService}/_functions/pubsubsub?collection=${collection}`
