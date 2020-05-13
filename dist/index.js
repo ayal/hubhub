@@ -20,6 +20,7 @@ class HubHub {
         this.sender_id = '';
         this.pubsubService = '';
         this.handler = (message) => { };
+        this.destroyed = false;
         console.log('hubhub ctor');
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
@@ -45,6 +46,10 @@ class HubHub {
         // prevent doubles
         console.log('hubhub: will listen to messages');
         this.handler = (message) => {
+            if (this.destroyed) {
+                console.log('hubhub: destroyed');
+                return;
+            }
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
@@ -60,6 +65,7 @@ class HubHub {
     }
     kill() {
         console.log('hubhub: killing...');
+        this.destroyed = true;
         // send off messages to wix too or make some window singleton to hanle this differently
         window.removeEventListener('message', this.handler);
     }

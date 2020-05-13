@@ -34,6 +34,7 @@ class HubHub implements HubHubType {
     ready: Promise<boolean>;
     resolveReady?: () => void;
     handler=(message:any)=>{};
+    destroyed = false;
 
     constructor() {
         console.log('hubhub ctor');
@@ -66,6 +67,10 @@ class HubHub implements HubHubType {
         // prevent doubles
         console.log('hubhub: will listen to messages');
         this.handler = (message:any) => {
+            if (this.destroyed) {
+                console.log('hubhub: destroyed');
+                return;
+            }
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
@@ -84,6 +89,7 @@ class HubHub implements HubHubType {
 
     kill() {
         console.log('hubhub: killing...');
+        this.destroyed = true;
         // send off messages to wix too or make some window singleton to hanle this differently
         window.removeEventListener('message', this.handler);
     }
