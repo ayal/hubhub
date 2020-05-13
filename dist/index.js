@@ -38,6 +38,7 @@ class HubHub {
             // already embedded so make sure ready
             this.resolveReady && this.resolveReady();
             console.warn('hubhub: not embedding twice');
+            return;
         }
         else {
             console.log('... embedding wix iframe...', this.pubsubService);
@@ -51,10 +52,6 @@ class HubHub {
         // prevent doubles
         console.log('hubhub: will listen to messages');
         this.handler = (message) => {
-            if (this.destroyed) {
-                console.log('hubhub: destroyed');
-                return;
-            }
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
