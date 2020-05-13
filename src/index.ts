@@ -141,7 +141,7 @@ class HubHub implements HubHubType {
 
     update(doc_id: string, data: any) {
         fetch(
-            `${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&sender_id=${this.sender_id}&data=${data}`
+            `${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&sender_id=${this.sender_id}&data=${JSON.stringify(data)}`
         );
     }
 
