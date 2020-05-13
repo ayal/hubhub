@@ -33,27 +33,13 @@ class HubHub implements HubHubType {
     public pubsubService?= '';
     ready: Promise<boolean>;
     resolveReady?: () => void;
+    handler:EventListener;
 
     constructor() {
         console.log('hubhub ctor');
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
-    }
-
-    handler(message:any) {
-        if (message.data.pubsubready) {
-            console.log('hubhub: got ready message');
-            this.resolveReady && this.resolveReady();
-        }
-
-        if (message.data.pubsub) {
-            const doc = message.data.pubsub.payload;
-            doc.data = JSON.parse(doc.data);
-            console.log("hubhub: got message", message.data.pubsub);
-            this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
-
-        }
     }
 
     init(pubsubService: string) {
@@ -81,7 +67,21 @@ class HubHub implements HubHubType {
 
         // prevent doubles
         console.log('hubhub: will listen to messages');
-        window.addEventListener("message", (e)=>this.handler(e));
+        this.handler = (message:any) => {
+            if (message.data.pubsubready) {
+                console.log('hubhub: got ready message');
+                this.resolveReady && this.resolveReady();
+            }
+    
+            if (message.data.pubsub) {
+                const doc = message.data.pubsub.payload;
+                doc.data = JSON.parse(doc.data);
+                console.log("hubhub: got message", message.data.pubsub);
+                this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
+    
+            }
+        }
+        window.addEventListener("message", this.handler);
     }
 
     kill() {

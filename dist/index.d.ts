@@ -22,8 +22,8 @@ declare class HubHub implements HubHubType {
     pubsubService?: string | undefined;
     ready: Promise<boolean>;
     resolveReady?: () => void;
+    handler: EventListener;
     constructor();
-    handler(message: any): void;
     init(pubsubService: string): void;
     kill(): void;
     get(collection: string, skip?: number): Promise<any>;
