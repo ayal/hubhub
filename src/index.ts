@@ -27,6 +27,10 @@ interface Callbacks {
     [collection: string]: (docs: Array<DocType>) => void;
 }
 
+declare global {
+    interface Window { hubhub: any; }
+}
+
 class HubHub implements HubHubType {
     onMessageCB: Callbacks = {};
     sender_id?= ''
@@ -140,7 +144,11 @@ class HubHub implements HubHubType {
 
 }
 
-const hubhub = new HubHub();
-export default hubhub;
+let hubhub = window.hubhub;
+if (!hubhub) {
+    hubhub = new HubHub();
+    window.hubhub = hubhub;
+}
+export default window.hubhub;
 
 

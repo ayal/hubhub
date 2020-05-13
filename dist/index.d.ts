@@ -13,24 +13,10 @@ export interface HubHubType {
     init(x: string): void;
     kill(): void;
 }
-interface Callbacks {
-    [collection: string]: (docs: Array<DocType>) => void;
+declare global {
+    interface Window {
+        hubhub: any;
+    }
 }
-declare class HubHub implements HubHubType {
-    onMessageCB: Callbacks;
-    sender_id?: string | undefined;
-    pubsubService?: string | undefined;
-    ready: Promise<boolean>;
-    resolveReady?: () => void;
-    handler: (message: any) => void;
-    destroyed: boolean;
-    constructor();
-    init(pubsubService: string): void;
-    kill(): void;
-    get(collection: string, skip?: number): Promise<any>;
-    on(collection: string, cb: (docs: Array<DocType>) => void): void;
-    set(collection: string, data: any, persist?: boolean): DocType | undefined;
-    update(doc_id: string, data: any): void;
-}
-declare const hubhub: HubHub;
-export default hubhub;
+declare const _default: any;
+export default _default;

@@ -100,6 +100,10 @@ class HubHub {
         fetch(`${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&sender_id=${this.sender_id}&data=${data}`);
     }
 }
-const hubhub = new HubHub();
-export default hubhub;
+let hubhub = window.hubhub;
+if (!hubhub) {
+    hubhub = new HubHub();
+    window.hubhub = hubhub;
+}
+export default window.hubhub;
 //# sourceMappingURL=index.js.map
