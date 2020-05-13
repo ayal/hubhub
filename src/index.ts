@@ -33,7 +33,7 @@ class HubHub implements HubHubType {
     public pubsubService?= '';
     ready: Promise<boolean>;
     resolveReady?: () => void;
-    handler:EventListener;
+    handler=(message:any)=>{};
 
     constructor() {
         console.log('hubhub ctor');

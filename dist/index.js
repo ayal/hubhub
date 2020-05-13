@@ -19,6 +19,7 @@ class HubHub {
         this.onMessageCB = {};
         this.sender_id = '';
         this.pubsubService = '';
+        this.handler = (message) => { };
         console.log('hubhub ctor');
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
