@@ -32,7 +32,6 @@ class HubHub {
             // already embedded so make sure ready
             this.resolveReady && this.resolveReady();
             console.warn('hubhub: not embedding twice');
-            return;
         }
         else {
             console.log('... embedding wix iframe...', this.pubsubService);
@@ -61,6 +60,7 @@ class HubHub {
     }
     kill() {
         console.log('hubhub: killing...');
+        // send off messages to wix too or make some window singleton to hanle this differently
         window.removeEventListener('message', this.handler);
     }
     get(collection, skip = 0) {
