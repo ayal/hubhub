@@ -23,5 +23,5 @@ declare global {
         hubhub: any;
     }
 }
-declare const _default: any;
+declare const _default: HubHubType;
 export default _default;

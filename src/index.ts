@@ -189,6 +189,6 @@ if (!hubhub) {
     hubhub = new HubHub();
     window.hubhub = hubhub;
 }
-export default window.hubhub;
+export default (window.hubhub as HubHubType);
 
 
