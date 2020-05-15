@@ -110,7 +110,7 @@ class HubHub {
         if (!data) {
             return;
         }
-        const docobj = { sender: JSON.stringify(this._auth), data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
+        const docobj = { sender: this.sender, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
         const docstring = JSON.stringify(docobj);
         fetch(`${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}`);
         return docobj;
