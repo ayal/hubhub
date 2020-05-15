@@ -70,7 +70,7 @@ class HubHub {
                 this.resolveReady && this.resolveReady();
             }
             if (message.data.pubsubauth) {
-                const user = message.data.pubsub.payload;
+                const user = message.data.pubsub;
                 console.log('hubhub: got auth ready message', user);
                 this.authResolve && this.authResolve(user);
             }
