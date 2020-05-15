@@ -33,7 +33,7 @@ class HubHub {
             console.log('hubhub: auth res', res);
             const user = yield this.authReady;
             console.log('hubhub: auth ready res', user);
-            this.sender = { id: user.id, name: user.nickname };
+            this.sender = { id: user._id, name: user.nickname };
             return user;
         });
     }
