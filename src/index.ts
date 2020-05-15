@@ -37,6 +37,8 @@ class HubHub implements HubHubType {
     public pubsubService?= '';
     ready: Promise<boolean>;
     resolveReady?: () => void;
+    authResolve?: (user:any) => void;
+    authReady: Promise<boolean>;
     handler=(message:any)=>{};
     inited = false;
 
@@ -45,16 +47,18 @@ class HubHub implements HubHubType {
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
+        this.authReady = new Promise(resolve => this.authResolve = resolve);
     }
 
     async auth(name:string) {
+        this.authReady = new Promise(resolve => this.authResolve = resolve);
         console.log('hubhub: authing', name);
 
         const res = await fetch(
             `${this.pubsubService}/_functions/pubsubauth?name=${name}`
         );
-
-       return true;
+        const user = await this.authReady;
+        return user;
     }
 
     init(pubsubService: string) {
@@ -90,6 +94,12 @@ class HubHub implements HubHubType {
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
+            }
+
+            if (message.data.pubsubready) {
+                const user = message.data.pubsub.payload;
+                console.log('hubhub: got auth message', user);
+                this.authResolve && this.authResolve(user);
             }
     
             if (message.data.pubsub) {

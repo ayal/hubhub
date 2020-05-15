@@ -25,12 +25,15 @@ class HubHub {
         this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
         localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
+        this.authReady = new Promise(resolve => this.authResolve = resolve);
     }
     auth(name) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.authReady = new Promise(resolve => this.authResolve = resolve);
             console.log('hubhub: authing', name);
             const res = yield fetch(`${this.pubsubService}/_functions/pubsubauth?name=${name}`);
-            return true;
+            const user = yield this.authReady;
+            return user;
         });
     }
     init(pubsubService) {
@@ -62,6 +65,11 @@ class HubHub {
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
+            }
+            if (message.data.pubsubready) {
+                const user = message.data.pubsub.payload;
+                console.log('hubhub: got auth message', user);
+                this.authResolve && this.authResolve(user);
             }
             if (message.data.pubsub) {
                 const doc = message.data.pubsub.payload;
