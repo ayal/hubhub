@@ -17,6 +17,7 @@ export interface HubHubType {
     on(collection: string, cb: (docs: Array<DocType>) => void): void,
     get(collection: string, skip: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
+    auth(name:string):any;
     sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;
@@ -38,7 +39,7 @@ class HubHub implements HubHubType {
     ready: Promise<boolean>;
     resolveReady?: () => void;
     authResolve?: (user:any) => void;
-    authReady: Promise<boolean>;
+    authReady: Promise<any>;
     handler=(message:any)=>{};
     inited = false;
 
@@ -57,7 +58,9 @@ class HubHub implements HubHubType {
         const res = await fetch(
             `${this.pubsubService}/_functions/pubsubauth?name=${name}`
         );
+        console.log('hubhub: auth res', res);
         const user = await this.authReady;
+        console.log('hubhub: auth ready res', user);
         return user;
     }
 
@@ -96,9 +99,9 @@ class HubHub implements HubHubType {
                 this.resolveReady && this.resolveReady();
             }
 
-            if (message.data.pubsubready) {
+            if (message.data.pubsubauth) {
                 const user = message.data.pubsub.payload;
-                console.log('hubhub: got auth message', user);
+                console.log('hubhub: got auth ready message', user);
                 this.authResolve && this.authResolve(user);
             }
     

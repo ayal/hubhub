@@ -8,6 +8,7 @@ export interface HubHubType {
     on(collection: string, cb: (docs: Array<DocType>) => void): void;
     get(collection: string, skip: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
+    auth(name: string): any;
     sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;

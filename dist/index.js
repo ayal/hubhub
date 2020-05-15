@@ -32,7 +32,9 @@ class HubHub {
             this.authReady = new Promise(resolve => this.authResolve = resolve);
             console.log('hubhub: authing', name);
             const res = yield fetch(`${this.pubsubService}/_functions/pubsubauth?name=${name}`);
+            console.log('hubhub: auth res', res);
             const user = yield this.authReady;
+            console.log('hubhub: auth ready res', user);
             return user;
         });
     }
@@ -66,9 +68,9 @@ class HubHub {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
             }
-            if (message.data.pubsubready) {
+            if (message.data.pubsubauth) {
                 const user = message.data.pubsub.payload;
-                console.log('hubhub: got auth message', user);
+                console.log('hubhub: got auth ready message', user);
                 this.authResolve && this.authResolve(user);
             }
             if (message.data.pubsub) {
