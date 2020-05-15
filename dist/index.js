@@ -17,13 +17,11 @@ function hubhub_uuidv4() {
 class HubHub {
     constructor() {
         this.onMessageCB = {};
-        this.sender_id = '';
         this.pubsubService = '';
         this.handler = (message) => { };
         this.inited = false;
+        this.sender = { id: '', name: '' };
         console.log('hubhub ctor');
-        this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
-        localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
         this.authReady = new Promise(resolve => this.authResolve = resolve);
     }
@@ -35,6 +33,7 @@ class HubHub {
             console.log('hubhub: auth res', res);
             const user = yield this.authReady;
             console.log('hubhub: auth ready res', user);
+            this.sender = { id: user.id, name: user.nickname };
             return user;
         });
     }
@@ -111,13 +110,13 @@ class HubHub {
         if (!data) {
             return;
         }
-        const docobj = { sender_id: this.sender_id, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
+        const docobj = { sender: JSON.stringify(this._auth), data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
         const docstring = JSON.stringify(docobj);
         fetch(`${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}`);
         return docobj;
     }
     update(doc_id, data) {
-        fetch(`${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&sender_id=${this.sender_id}&data=${JSON.stringify(data)}`);
+        fetch(`${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&data=${JSON.stringify(data)}`);
     }
 }
 let hubhub = window.hubhub;

@@ -6,9 +6,14 @@ function hubhub_uuidv4(): string {
     });
 }
 
+export interface SenderType {
+    id:string;
+    name:string;
+}
+
 export interface DocType {
     data: string;
-    sender_id?: string;
+    sender: SenderType;
     doc_id: string;
     time: number;
 }
@@ -18,10 +23,10 @@ export interface HubHubType {
     get(collection: string, skip: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
     auth(name:string):any;
-    sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;
     kill():void;
+    sender:SenderType;
 }
 
 interface Callbacks {
@@ -34,7 +39,6 @@ declare global {
 
 class HubHub implements HubHubType {
     onMessageCB: Callbacks = {};
-    sender_id?= ''
     public pubsubService?= '';
     ready: Promise<boolean>;
     resolveReady?: () => void;
@@ -42,11 +46,10 @@ class HubHub implements HubHubType {
     authReady: Promise<any>;
     handler=(message:any)=>{};
     inited = false;
+    sender = {id:'',name:''};
 
     constructor() {
         console.log('hubhub ctor');
-        this.sender_id = localStorage.getItem('hubhub_sender_id') || hubhub_uuidv4();
-        localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
         this.authReady = new Promise(resolve => this.authResolve = resolve);
     }
@@ -61,6 +64,7 @@ class HubHub implements HubHubType {
         console.log('hubhub: auth res', res);
         const user = await this.authReady;
         console.log('hubhub: auth ready res', user);
+        this.sender = {id:user.id, name:user.nickname};
         return user;
     }
 
@@ -153,7 +157,7 @@ class HubHub implements HubHubType {
         if (!data) {
             return;
         }
-        const docobj: DocType = { sender_id: this.sender_id, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
+        const docobj: DocType = { sender: JSON.stringify(this._auth), data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
         const docstring = JSON.stringify(docobj);
         fetch(
             `${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}`
@@ -164,7 +168,7 @@ class HubHub implements HubHubType {
 
     update(doc_id: string, data: any) {
         fetch(
-            `${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&sender_id=${this.sender_id}&data=${JSON.stringify(data)}`
+            `${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&data=${JSON.stringify(data)}`
         );
     }
 

@@ -1,6 +1,10 @@
+export interface SenderType {
+    id: string;
+    name: string;
+}
 export interface DocType {
     data: string;
-    sender_id?: string;
+    sender: SenderType;
     doc_id: string;
     time: number;
 }
@@ -9,10 +13,10 @@ export interface HubHubType {
     get(collection: string, skip: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
     auth(name: string): any;
-    sender_id?: string;
     ready: Promise<boolean>;
     init(x: string): void;
     kill(): void;
+    sender: SenderType;
 }
 declare global {
     interface Window {
