@@ -7,8 +7,8 @@ function hubhub_uuidv4(): string {
 }
 
 export interface SenderType {
-    id:string;
-    name:string;
+    id: string;
+    name: string;
 }
 
 export interface DocType {
@@ -22,11 +22,11 @@ export interface HubHubType {
     on(collection: string, cb: (docs: Array<DocType>) => void): void,
     get(collection: string, skip: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
-    auth(name:string):any;
+    auth(name: string): any;
     ready: Promise<boolean>;
     init(x: string): void;
-    kill():void;
-    sender:SenderType;
+    kill(): void;
+    sender: SenderType;
 }
 
 interface Callbacks {
@@ -42,11 +42,11 @@ class HubHub implements HubHubType {
     public pubsubService?= '';
     ready: Promise<boolean>;
     resolveReady?: () => void;
-    authResolve?: (user:any) => void;
+    authResolve?: (user: any) => void;
     authReady: Promise<any>;
-    handler=(message:any)=>{};
+    handler = (message: any) => { };
     inited = false;
-    sender = {id:'',name:''};
+    sender = { id: '', name: '' };
 
     constructor() {
         console.log('hubhub ctor');
@@ -54,11 +54,15 @@ class HubHub implements HubHubType {
         this.authReady = new Promise(resolve => this.authResolve = resolve);
     }
 
-    async auth(name:string) {
+    async auth(name: string) {
         const userBeforeAuth = await this.authReady;
         console.log('hubhub: user before auth', userBeforeAuth);
         if (userBeforeAuth.nickname === name) {
             console.log('hubhub: already authed');
+            this.sender = {
+                id: userBeforeAuth._id,
+                name: userBeforeAuth.nickname
+            };
             return userBeforeAuth;
         }
         this.authReady = new Promise(resolve => this.authResolve = resolve);
@@ -70,7 +74,7 @@ class HubHub implements HubHubType {
         console.log('hubhub: auth res', res);
         const user = await this.authReady;
         console.log('hubhub: auth ready res', user);
-        this.sender = {id:user._id, name:user.nickname};
+        this.sender = { id: user._id, name: user.nickname };
         return user;
     }
 
@@ -103,7 +107,7 @@ class HubHub implements HubHubType {
 
         // prevent doubles
         console.log('hubhub: will listen to messages');
-        this.handler = (message:any) => {
+        this.handler = (message: any) => {
             if (message.data.pubsubready) {
                 console.log('hubhub: got ready message');
                 this.resolveReady && this.resolveReady();
@@ -114,13 +118,13 @@ class HubHub implements HubHubType {
                 console.log('hubhub: got auth ready message', user);
                 this.authResolve && this.authResolve(user);
             }
-    
+
             if (message.data.pubsub) {
                 const doc = message.data.pubsub.payload;
                 doc.data = JSON.parse(doc.data);
                 console.log("hubhub: got message", message.data.pubsub);
                 this.onMessageCB && this.onMessageCB[message.data.pubsub.payload.collection]([doc]);
-    
+
             }
         }
         window.addEventListener("message", this.handler);
@@ -139,9 +143,9 @@ class HubHub implements HubHubType {
 
         console.log('hubhub: get response', res);
         const docs = await res.json();
-        return docs.map((doc:any) => {
-          doc.data = JSON.parse(doc.data);
-          return doc;
+        return docs.map((doc: any) => {
+            doc.data = JSON.parse(doc.data);
+            return doc;
         });
     }
 

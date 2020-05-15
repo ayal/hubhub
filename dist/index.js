@@ -31,6 +31,10 @@ class HubHub {
             console.log('hubhub: user before auth', userBeforeAuth);
             if (userBeforeAuth.nickname === name) {
                 console.log('hubhub: already authed');
+                this.sender = {
+                    id: userBeforeAuth._id,
+                    name: userBeforeAuth.nickname
+                };
                 return userBeforeAuth;
             }
             this.authReady = new Promise(resolve => this.authResolve = resolve);
