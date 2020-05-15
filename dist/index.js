@@ -27,6 +27,12 @@ class HubHub {
     }
     auth(name) {
         return __awaiter(this, void 0, void 0, function* () {
+            const userBeforeAuth = yield this.authReady;
+            console.log('hubhub: user before auth', userBeforeAuth);
+            if (userBeforeAuth.nickname === name) {
+                console.log('hubhub: already authed');
+                return userBeforeAuth;
+            }
             this.authReady = new Promise(resolve => this.authResolve = resolve);
             console.log('hubhub: authing', name);
             const res = yield fetch(`${this.pubsubService}/_functions/pubsubauth?name=${name}`);
