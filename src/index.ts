@@ -101,7 +101,7 @@ class HubHub implements HubHubType {
             }
 
             if (message.data.pubsubauth) {
-                const user = message.data.pubsub;
+                const user = message.data.pubsubauth;
                 console.log('hubhub: got auth ready message', user);
                 this.authResolve && this.authResolve(user);
             }
