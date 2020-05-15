@@ -184,7 +184,7 @@ class HubHub implements HubHubType {
 
 }
 
-let hubhub = window.hubhub;
+let hubhub:HubHubType = window.hubhub;
 if (!hubhub) {
     hubhub = new HubHub();
     window.hubhub = hubhub;
