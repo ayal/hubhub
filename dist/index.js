@@ -26,6 +26,13 @@ class HubHub {
         localStorage.setItem('hubhub_sender_id', this.sender_id);
         this.ready = new Promise(resolve => this.resolveReady = resolve);
     }
+    auth(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('hubhub: authing', name);
+            const res = yield fetch(`${this.pubsubService}/_functions/pubsubauth?name=${name}`);
+            return true;
+        });
+    }
     init(pubsubService) {
         if (this.inited) {
             console.log('hubhub: not initing twice');

@@ -47,6 +47,16 @@ class HubHub implements HubHubType {
         this.ready = new Promise(resolve => this.resolveReady = resolve);
     }
 
+    async auth(name:string) {
+        console.log('hubhub: authing', name);
+
+        const res = await fetch(
+            `${this.pubsubService}/_functions/pubsubauth?name=${name}`
+        );
+
+       return true;
+    }
+
     init(pubsubService: string) {
         if (this.inited) {
             console.log('hubhub: not initing twice');
