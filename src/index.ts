@@ -58,7 +58,8 @@ class HubHub implements HubHubType {
         const res = await fetch(
             `${this.pubsubService}/_functions/pubsubauth?name=${name}`
         );
-        console.log('hubhub: auth res', res);
+        const resjson = await res.json();
+        console.log('hubhub: auth res json', resjson);
         const user = await this.authReady;
         console.log('hubhub: auth ready res', user);
         return user;

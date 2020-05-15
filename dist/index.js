@@ -32,7 +32,8 @@ class HubHub {
             this.authReady = new Promise(resolve => this.authResolve = resolve);
             console.log('hubhub: authing', name);
             const res = yield fetch(`${this.pubsubService}/_functions/pubsubauth?name=${name}`);
-            console.log('hubhub: auth res', res);
+            const resjson = yield res.json();
+            console.log('hubhub: auth res json', resjson);
             const user = yield this.authReady;
             console.log('hubhub: auth ready res', user);
             return user;
