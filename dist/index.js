@@ -21,9 +21,11 @@ class HubHub {
         this.handler = (message) => { };
         this.inited = false;
         this.sender = { id: '', name: '' };
+        this.hubhubid = '';
         console.log('hubhub ctor');
         this.ready = new Promise(resolve => this.resolveReady = resolve);
         this.authReady = new Promise(resolve => this.authResolve = resolve);
+        this.hubhubid = hubhub_uuidv4();
     }
     auth(name) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,19 +33,14 @@ class HubHub {
             console.log('hubhub: user before auth', userBeforeAuth);
             if (userBeforeAuth.nickname === name) {
                 console.log('hubhub: already authed');
-                this.sender = {
-                    id: userBeforeAuth._id,
-                    name: userBeforeAuth.nickname
-                };
                 return userBeforeAuth;
             }
             this.authReady = new Promise(resolve => this.authResolve = resolve);
             console.log('hubhub: authing', name);
-            const res = yield fetch(`${this.pubsubService}/_functions/pubsubauth?name=${name}`);
+            const res = yield fetch(`${this.pubsubService}/_functions/pubsubauth?name=${name}&hubhubid=${this.hubhubid}`);
             console.log('hubhub: auth res', res);
             const user = yield this.authReady;
             console.log('hubhub: auth ready res', user);
-            this.sender = { id: user._id, name: user.nickname };
             return user;
         });
     }
@@ -66,7 +63,7 @@ class HubHub {
             const framewrap = document.createElement('div');
             framewrap.hidden = true;
             framewrap.id = 'hubhub-frame-wrap';
-            framewrap.innerHTML = `<iframe src="${this.pubsubService}" title="hubhub id="hubhub-frame"></iframe>`;
+            framewrap.innerHTML = `<iframe src="${this.pubsubService}?hubhubid=${this.hubhubid}" title="hubhub id="hubhub-frame"></iframe>`;
             document.body.appendChild(framewrap);
             console.log('hubhub: embedded wix iframe...', this.pubsubService);
         }
@@ -80,6 +77,7 @@ class HubHub {
             if (message.data.pubsubauth) {
                 const user = message.data.pubsubauth;
                 console.log('hubhub: got auth ready message', user);
+                this.sender = { id: user._id, name: user.nickname };
                 this.authResolve && this.authResolve(user);
             }
             if (message.data.pubsub) {
@@ -97,7 +95,7 @@ class HubHub {
     get(collection, skip = 0) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('hubhub: getting', collection, skip);
-            const res = yield fetch(`${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}`);
+            const res = yield fetch(`${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}&hubhubid=${this.hubhubid}`);
             console.log('hubhub: get response', res);
             const docs = yield res.json();
             return docs.map((doc) => {
@@ -113,7 +111,7 @@ class HubHub {
         }
         console.log('hubhub: asking to subscribe to', collection);
         this.onMessageCB[collection] = cb;
-        fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}`);
+        fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}&hubhubid=${this.hubhubid}`);
     }
     set(collection, data, persist = true) {
         console.log('hubhub: sending', data);
@@ -122,11 +120,11 @@ class HubHub {
         }
         const docobj = { sender: this.sender, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
         const docstring = JSON.stringify(docobj);
-        fetch(`${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}`);
+        fetch(`${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}&hubhubid=${this.hubhubid}`);
         return docobj;
     }
     update(doc_id, data) {
-        fetch(`${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&data=${JSON.stringify(data)}`);
+        fetch(`${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&data=${JSON.stringify(data)}&hubhubid=${this.hubhubid}`);
     }
 }
 let hubhub = window.hubhub;

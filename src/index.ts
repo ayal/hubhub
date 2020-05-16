@@ -12,7 +12,7 @@ export interface SenderType {
 }
 
 export interface DocType {
-    data: string;
+    data: any;
     sender: SenderType;
     doc_id: string;
     time: number;
@@ -22,8 +22,11 @@ export interface HubHubType {
     on(collection: string, cb: (docs: Array<DocType>) => void): void,
     get(collection: string, skip: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
+    update(collection: string, data: any): void;
+
     auth(name: string): any;
     ready: Promise<boolean>;
+    authReady: Promise<any>;
     init(x: string): void;
     kill(): void;
     sender: SenderType;
@@ -41,17 +44,19 @@ class HubHub implements HubHubType {
     onMessageCB: Callbacks = {};
     public pubsubService?= '';
     ready: Promise<boolean>;
+    authReady: Promise<any>;
     resolveReady?: () => void;
     authResolve?: (user: any) => void;
-    authReady: Promise<any>;
     handler = (message: any) => { };
     inited = false;
     sender = { id: '', name: '' };
+    hubhubid = '';
 
     constructor() {
         console.log('hubhub ctor');
         this.ready = new Promise(resolve => this.resolveReady = resolve);
         this.authReady = new Promise(resolve => this.authResolve = resolve);
+        this.hubhubid = hubhub_uuidv4();
     }
 
     async auth(name: string) {
@@ -59,22 +64,17 @@ class HubHub implements HubHubType {
         console.log('hubhub: user before auth', userBeforeAuth);
         if (userBeforeAuth.nickname === name) {
             console.log('hubhub: already authed');
-            this.sender = {
-                id: userBeforeAuth._id,
-                name: userBeforeAuth.nickname
-            };
             return userBeforeAuth;
         }
         this.authReady = new Promise(resolve => this.authResolve = resolve);
         console.log('hubhub: authing', name);
 
         const res = await fetch(
-            `${this.pubsubService}/_functions/pubsubauth?name=${name}`
+            `${this.pubsubService}/_functions/pubsubauth?name=${name}&hubhubid=${this.hubhubid}`
         );
         console.log('hubhub: auth res', res);
         const user = await this.authReady;
         console.log('hubhub: auth ready res', user);
-        this.sender = { id: user._id, name: user.nickname };
         return user;
     }
 
@@ -99,7 +99,7 @@ class HubHub implements HubHubType {
             const framewrap = document.createElement('div');
             framewrap.hidden = true;
             framewrap.id = 'hubhub-frame-wrap';
-            framewrap.innerHTML = `<iframe src="${this.pubsubService}" title="hubhub id="hubhub-frame"></iframe>`;
+            framewrap.innerHTML = `<iframe src="${this.pubsubService}?hubhubid=${this.hubhubid}" title="hubhub id="hubhub-frame"></iframe>`;
             document.body.appendChild(framewrap);
 
             console.log('hubhub: embedded wix iframe...', this.pubsubService);
@@ -116,6 +116,7 @@ class HubHub implements HubHubType {
             if (message.data.pubsubauth) {
                 const user = message.data.pubsubauth;
                 console.log('hubhub: got auth ready message', user);
+                this.sender = { id: user._id, name: user.nickname };
                 this.authResolve && this.authResolve(user);
             }
 
@@ -138,7 +139,7 @@ class HubHub implements HubHubType {
         console.log('hubhub: getting', collection, skip);
 
         const res = await fetch(
-            `${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}`
+            `${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}&hubhubid=${this.hubhubid}`
         );
 
         console.log('hubhub: get response', res);
@@ -158,7 +159,7 @@ class HubHub implements HubHubType {
         console.log('hubhub: asking to subscribe to', collection);
         this.onMessageCB[collection] = cb;
         fetch(
-            `${this.pubsubService}/_functions/pubsubsub?collection=${collection}`
+            `${this.pubsubService}/_functions/pubsubsub?collection=${collection}&hubhubid=${this.hubhubid}`
         );
     }
 
@@ -170,7 +171,7 @@ class HubHub implements HubHubType {
         const docobj: DocType = { sender: this.sender, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
         const docstring = JSON.stringify(docobj);
         fetch(
-            `${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}`
+            `${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}&hubhubid=${this.hubhubid}`
         );
         return docobj;
     }
@@ -178,7 +179,7 @@ class HubHub implements HubHubType {
 
     update(doc_id: string, data: any) {
         fetch(
-            `${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&data=${JSON.stringify(data)}`
+            `${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&data=${JSON.stringify(data)}&hubhubid=${this.hubhubid}`
         );
     }
 
