@@ -173,6 +173,7 @@ class HubHub implements HubHubType {
         fetch(
             `${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&persist=${persist}&hubhubid=${this.hubhubid}`
         );
+        docobj.data = JSON.parse(docobj.data);
         return docobj;
     }
 
