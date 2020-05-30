@@ -92,10 +92,10 @@ class HubHub {
     kill() {
         console.log('hubhub: killing...');
     }
-    get(collection, skip = 0) {
+    get(collection, skip = 0, limit = 10) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('hubhub: getting', collection, skip);
-            const res = yield fetch(`${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}&hubhubid=${this.hubhubid}`);
+            console.log('hubhub: getting', collection, skip, limit);
+            const res = yield fetch(`${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}&limit=${limit}&hubhubid=${this.hubhubid}`);
             console.log('hubhub: get response', res);
             const docs = yield res.json();
             return docs.map((doc) => {

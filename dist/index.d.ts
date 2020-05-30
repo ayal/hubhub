@@ -10,7 +10,7 @@ export interface DocType {
 }
 export interface HubHubType {
     on(collection: string, cb: (docs: Array<DocType>) => void): void;
-    get(collection: string, skip: number): Promise<Array<DocType>>;
+    get(collection: string, skip: number, limit: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
     update(collection: string, data: any): void;
     auth(name: string): any;
