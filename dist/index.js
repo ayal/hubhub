@@ -111,7 +111,7 @@ class HubHub {
         }
         console.log('hubhub: asking to subscribe to', collection);
         this.onMessageCB[collection] = cb;
-        fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}&hubhubid=${this.hubhubid}`);
+        return fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}&hubhubid=${this.hubhubid}`);
     }
     set(collection, data, persist = true) {
         console.log('hubhub: sending', data);

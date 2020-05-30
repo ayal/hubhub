@@ -158,7 +158,7 @@ class HubHub implements HubHubType {
         }
         console.log('hubhub: asking to subscribe to', collection);
         this.onMessageCB[collection] = cb;
-        fetch(
+        return fetch(
             `${this.pubsubService}/_functions/pubsubsub?collection=${collection}&hubhubid=${this.hubhubid}`
         );
     }
