@@ -104,14 +104,14 @@ class HubHub {
             });
         });
     }
-    on(collection, cb) {
+    on(collection, rid, cb) {
         if (this.onMessageCB[collection]) {
-            console.log('hubhub: not subscribing twice', collection);
+            console.warn('hubhub: not subscribing twice', collection);
             return;
         }
         console.log('hubhub: asking to subscribe to', collection);
         this.onMessageCB[collection] = cb;
-        return fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}&hubhubid=${this.hubhubid}`);
+        return fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}&rid=${rid}&hubhubid=${this.hubhubid}`);
     }
     set(collection, data, persist = true) {
         console.log('hubhub: sending', data);

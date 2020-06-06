@@ -19,7 +19,7 @@ export interface DocType {
 }
 
 export interface HubHubType {
-    on(collection: string, cb: (docs: Array<DocType>) => void): void,
+    on(collection: string, rid:string, cb: (docs: Array<DocType>) => void): void,
     get(collection: string, skip: number, limit: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
     update(collection: string, data: any): void;
@@ -151,15 +151,15 @@ class HubHub implements HubHubType {
     }
 
 
-    on(collection: string, cb: (docs: Array<DocType>) => void) {
+    on(collection: string, rid: string, cb: (docs: Array<DocType>) => void) {
         if (this.onMessageCB[collection]) {
-            console.log('hubhub: not subscribing twice', collection);
+            console.warn('hubhub: not subscribing twice', collection);
             return;
         }
         console.log('hubhub: asking to subscribe to', collection);
         this.onMessageCB[collection] = cb;
         return fetch(
-            `${this.pubsubService}/_functions/pubsubsub?collection=${collection}&hubhubid=${this.hubhubid}`
+            `${this.pubsubService}/_functions/pubsubsub?collection=${collection}&rid=${rid}&hubhubid=${this.hubhubid}`
         );
     }
 

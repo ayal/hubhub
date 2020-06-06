@@ -9,7 +9,7 @@ export interface DocType {
     time: number;
 }
 export interface HubHubType {
-    on(collection: string, cb: (docs: Array<DocType>) => void): void;
+    on(collection: string, rid: string, cb: (docs: Array<DocType>) => void): void;
     get(collection: string, skip: number, limit: number): Promise<Array<DocType>>;
     set(collection: string, data: any, persist: boolean): DocType | undefined;
     update(collection: string, data: any): void;
