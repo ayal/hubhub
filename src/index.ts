@@ -152,12 +152,12 @@ class HubHub implements HubHubType {
 
 
     on(collection: string, rid: string, cb: (docs: Array<DocType>) => void) {
-        if (this.onMessageCB[collection + '_' + rid]) {
+        if (this.onMessageCB[collection]) {
             console.warn('hubhub: not subscribing twice', collection);
             return;
         }
         console.log('hubhub: asking to subscribe to', collection, rid);
-        this.onMessageCB[collection + '_' + rid] = cb;
+        this.onMessageCB[collection] = cb;
         return fetch(
             `${this.pubsubService}/_functions/pubsubsub?collection=${collection}&rid=${rid}&hubhubid=${this.hubhubid}`
         );
