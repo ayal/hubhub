@@ -113,7 +113,7 @@ class HubHub {
         this.onMessageCB[collection] = cb;
         return fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}&rid=${rid}&hubhubid=${this.hubhubid}`);
     }
-    set(collection, data, persist = true) {
+    set(collection, rid, data, persist = true) {
         console.log('hubhub: sending', data);
         if (!data) {
             return;

@@ -21,7 +21,7 @@ export interface DocType {
 export interface HubHubType {
     on(collection: string, rid:string, cb: (docs: Array<DocType>) => void): void,
     get(collection: string, skip: number, limit: number): Promise<Array<DocType>>;
-    set(collection: string, data: any, persist: boolean): DocType | undefined;
+    set(collection: string, rid:string, data: any, persist: boolean): DocType | undefined;
     update(collection: string, data: any): void;
 
     auth(name: string): any;
@@ -163,7 +163,7 @@ class HubHub implements HubHubType {
         );
     }
 
-    set(collection: string, data: any, persist = true) {
+    set(collection: string, rid:string, data: any, persist = true) {
         console.log('hubhub: sending', data);
         if (!data) {
             return;
