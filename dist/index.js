@@ -105,11 +105,11 @@ class HubHub {
         });
     }
     on(collection, rid, cb) {
-        if (this.onMessageCB[collection]) {
+        if (this.onMessageCB[collection + '_' + rid]) {
             console.warn('hubhub: not subscribing twice', collection);
             return;
         }
-        console.log('hubhub: asking to subscribe to', collection);
+        console.log('hubhub: asking to subscribe to', collection, rid);
         this.onMessageCB[collection] = cb;
         return fetch(`${this.pubsubService}/_functions/pubsubsub?collection=${collection}&rid=${rid}&hubhubid=${this.hubhubid}`);
     }
