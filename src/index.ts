@@ -20,7 +20,7 @@ export interface DocType {
 
 export interface HubHubType {
     on(collection: string, rid:string, cb: (docs: Array<DocType>) => void): void,
-    get(collection: string, skip: number, limit: number): Promise<Array<DocType>>;
+    get(collection: string, rid:string, skip: number, limit: number): Promise<Array<DocType>>;
     set(collection: string, rid:string, data: any, persist: boolean): DocType | undefined;
     update(collection: string, data: any): void;
 
@@ -135,11 +135,11 @@ class HubHub implements HubHubType {
         console.log('hubhub: killing...');
     }
 
-    async get(collection: string, skip = 0, limit=10) {
+    async get(collection: string, rid:string, skip = 0, limit=10) {
         console.log('hubhub: getting', collection, skip, limit);
 
         const res = await fetch(
-            `${this.pubsubService}/_functions/pubsubget?collection=${collection}&skip=${skip}&limit=${limit}&hubhubid=${this.hubhubid}`
+            `${this.pubsubService}/_functions/pubsubget?collection=${collection}&rid=${rid}&skip=${skip}&limit=${limit}&hubhubid=${this.hubhubid}`
         );
 
         console.log('hubhub: get response', res);
