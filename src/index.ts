@@ -124,7 +124,7 @@ class HubHub implements HubHubType {
                 const doc = message.data.pubsub.payload;
                 doc.data = JSON.parse(doc.data);
                 console.log("hubhub: got message", message.data.pubsub);
-                const cb = this.onMessageCB && this.onMessageCB[doc.collection + '_' + doc.rid];
+                const cb = this.onMessageCB && this.onMessageCB[doc.collection];
                 cb([doc]);
             }
         }
