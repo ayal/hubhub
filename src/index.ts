@@ -30,6 +30,8 @@ export interface HubHubType {
     init(x: string): void;
     kill(): void;
     sender: SenderType;
+
+    collection(name:string):Collection;
 }
 
 interface Callbacks {
