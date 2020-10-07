@@ -174,7 +174,7 @@ class HubHub implements HubHubType {
         console.log('hubhub: getting', collection, skip, limit);
 
         const res = await fetch(
-            `${this.pubsubService}/_functions/pubsubget?collection=${collection}&rid=${rid}&skip=${skip}&limit=${limit}&hubhubid=${this.hubhubid}`
+            `${this.pubsubService}/_functions/pubsubget?collection=${collection}${rid ? `&rid=${rid}` : ''}&skip=${skip}&limit=${limit}&hubhubid=${this.hubhubid}`
         );
 
         console.log('hubhub: get response', res);
