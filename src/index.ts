@@ -19,9 +19,9 @@ export interface DocType {
 }
 
 export interface HubHubType {
-    on(collection: string, rid:string, cb: (docs: Array<DocType>) => void): void,
-    get(collection: string, rid:string, skip: number, limit: number): Promise<Array<DocType>>;
-    set(collection: string, rid:string, data: any, persist: boolean): DocType | undefined;
+    on(collection: string, rid: string, cb: (docs: Array<DocType>) => void): void,
+    get(collection: string, rid: string | undefined, skip: number, limit: number): Promise<Array<DocType>>;
+    set(collection: string, rid: string, data: any, persist: boolean): DocType | undefined;
     update(collection: string, data: any): void;
 
     auth(name: string): any;
@@ -38,6 +38,35 @@ interface Callbacks {
 
 declare global {
     interface Window { hubhub: any; }
+}
+
+class Document {
+    id: string;
+    collection:string;
+    constructor(collection:string, id?: string) {
+        this.id = id || hubhub_uuidv4();
+        this.collection = collection;
+    }
+    set(data:object, persist=true) {
+        return hubhub.set(this.collection, this.id, data, persist)
+    }
+    get(skip = 0, limit = 10) {
+        return hubhub.get(this.collection, this.id, skip, limit);
+    }
+}
+
+class Collection {
+    name: string;
+    constructor(name: string) {
+        this.name = name;
+    }
+    get(skip = 0, limit = 10) {
+        return hubhub.get(this.name, undefined, skip, limit);
+    }
+    doc(id: string) {
+        return new Document(this.name, id);
+    }
+
 }
 
 class HubHub implements HubHubType {
@@ -76,6 +105,10 @@ class HubHub implements HubHubType {
         const user = await this.authReady;
         console.log('hubhub: auth ready res', user);
         return user;
+    }
+
+    collection(name: string) {
+        return new Collection(name);
     }
 
     init(pubsubService: string) {
@@ -135,7 +168,7 @@ class HubHub implements HubHubType {
         console.log('hubhub: killing...');
     }
 
-    async get(collection: string, rid:string, skip = 0, limit=10) {
+    async get(collection: string, rid: string, skip = 0, limit = 10) {
         console.log('hubhub: getting', collection, skip, limit);
 
         const res = await fetch(
@@ -163,7 +196,7 @@ class HubHub implements HubHubType {
         );
     }
 
-    set(collection: string, rid:string, data: any, persist = true) {
+    set(collection: string, rid: string, data: any, persist = true) {
         console.log('hubhub: sending', data);
         if (!data) {
             return;
@@ -184,9 +217,16 @@ class HubHub implements HubHubType {
         );
     }
 
+    delete(doc_id: string) {
+        fetch(
+            `${this.pubsubService}/_functions/pubsubdelete?doc_id=${doc_id}`
+        );
+    }
+
+
 }
 
-let hubhub:HubHubType = window.hubhub;
+let hubhub: HubHubType = window.hubhub;
 if (!hubhub) {
     hubhub = new HubHub();
     window.hubhub = hubhub;

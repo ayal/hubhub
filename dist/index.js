@@ -14,6 +14,29 @@ function hubhub_uuidv4() {
         return v.toString(16);
     });
 }
+class Document {
+    constructor(collection, id) {
+        this.id = id || hubhub_uuidv4();
+        this.collection = collection;
+    }
+    set(data, persist = true) {
+        return hubhub.set(this.collection, this.id, data, persist);
+    }
+    get(skip = 0, limit = 10) {
+        return hubhub.get(this.collection, this.id, skip, limit);
+    }
+}
+class Collection {
+    constructor(name) {
+        this.name = name;
+    }
+    get(skip = 0, limit = 10) {
+        return hubhub.get(this.name, undefined, skip, limit);
+    }
+    doc(id) {
+        return new Document(this.name, id);
+    }
+}
 class HubHub {
     constructor() {
         this.onMessageCB = {};
@@ -43,6 +66,9 @@ class HubHub {
             console.log('hubhub: auth ready res', user);
             return user;
         });
+    }
+    collection(name) {
+        return new Collection(name);
     }
     init(pubsubService) {
         if (this.inited) {
@@ -127,6 +153,9 @@ class HubHub {
     }
     update(doc_id, data) {
         fetch(`${this.pubsubService}/_functions/pubsubupdate?doc_id=${doc_id}&data=${JSON.stringify(data)}&hubhubid=${this.hubhubid}`);
+    }
+    delete(doc_id) {
+        fetch(`${this.pubsubService}/_functions/pubsubdelete?doc_id=${doc_id}`);
     }
 }
 let hubhub = window.hubhub;
