@@ -147,7 +147,7 @@ class HubHub {
         }
         const docobj = { sender: this.sender, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
         const docstring = JSON.stringify(docobj);
-        fetch(`${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&rid=${rid}&persist=${persist}&hubhubid=${this.hubhubid}`);
+        fetch(`${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}${rid ? `&rid=${rid}` : ''}&persist=${persist}&hubhubid=${this.hubhubid}`);
         docobj.data = JSON.parse(docobj.data);
         return docobj;
     }

@@ -65,7 +65,7 @@ class Collection {
     get(skip = 0, limit = 10) {
         return hubhub.get(this.name, undefined, skip, limit);
     }
-    doc(id: string) {
+    doc(id?: string) {
         return new Document(this.name, id);
     }
 
@@ -206,7 +206,7 @@ class HubHub implements HubHubType {
         const docobj: DocType = { sender: this.sender, data: JSON.stringify(data), doc_id: hubhub_uuidv4(), time: (new Date()).getTime() };
         const docstring = JSON.stringify(docobj);
         fetch(
-            `${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}&rid=${rid}&persist=${persist}&hubhubid=${this.hubhubid}`
+            `${this.pubsubService}/_functions/pubsub?collection=${collection}&message=${docstring}${rid ? `&rid=${rid}` : ''}&persist=${persist}&hubhubid=${this.hubhubid}`
         );
         docobj.data = JSON.parse(docobj.data);
         return docobj;

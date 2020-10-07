@@ -37,7 +37,7 @@ declare class Collection {
     name: string;
     constructor(name: string);
     get(skip?: number, limit?: number): Promise<DocType[]>;
-    doc(id: string): Document;
+    doc(id?: string): Document;
 }
 declare const _default: HubHubType;
 export default _default;
